@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生日派对🎉</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF6B8B',
+            secondary: '#A78BFA',
+            accent: '#FBBF24',
+            light: '#FFF1F2',
+            dark: '#4C1D95'
+          },
+          fontFamily: {
+            party: ['"Comic Sans MS"', '"Marker Felt"', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+      .animate-pulse-slow {
+        animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        opacity: 0;
+        z-index: 1000;
+        pointer-events: none;
+      }
+      .message-appear {
+        animation: fadeIn 0.5s ease-out;
+      }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-light to-purple-100 min-h-screen overflow-x-hidden">
+  <!-- 音乐 -->
+  <audio id="partyMusic" loop>
+    <source src="./music/bgMusic.mp3" type="audio/mpeg">
+   您的浏览器不支持音频播放
+  </audio>
+
+  <!-- 彩带 -->
+  <div id="confetti-container"></div>
+
+  <div class="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+
+    <header class="text-center mb-8 mt-12">
+      <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary animate-pulse-slow">
+        欢迎参加我的生日派对🎂
+      </h1>
+    </header>
+
+    <div class="text-center mb-12">
+      <div class="relative w-40 h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-primary shadow-lg animate-float">
+        <img src="./WechatIMG32 2.jpg" alt="头像" class="w-full h-full object-cover">
+      </div>
+      
+      <!-- 名字 -->
+      <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark mb-4">嗯[名字]</h2>
+      <!-- <h3 class="text-[clamp(1rem,2vw,1.25rem)] text-gray-700 max-w-md mx-auto bg-white/70 backdrop-blur-sm py-4 px-6 rounded-xl shadow-md">
+        🎀快快乐乐⭐️ ⭐️开开心心🎀
+      </h3>
+      <hr>
+      <br>
+      <hr> -->
+      <!-- Bio -->
+      <div class="text-[clamp(1rem,2vw,1.25rem)] text-gray-700 max-w-md mx-auto bg-white/70 backdrop-blur-sm py-4 px-6 rounded-xl shadow-md">
+        🎉感谢每一个出现在我生命中的人，愿我们的每一天都充满阳光与欢笑，爱与被爱都恰到好处🎉
+      </div>
+    </div>
+
+    <!-- 互动按钮区域 -->
+    <div class="mb-16 text-center">
+      <h3 class="text-xl font-semibold text-gray-800 mb-6">为我送上祝福吧！</h3>
+      <div class="flex flex-wrap justify-center gap-4">
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="❤️">
+          ❤️ <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="💯">
+          💯 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="🥳">
+          🥳 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="👊">
+          👊 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="🌹">
+          🌹 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="🍭">
+          🍭 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="🎂">
+          🎂 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="🌈">
+          🌈 <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+        <button class="emoji-btn text-3xl p-4 rounded-full bg-white shadow-lg hover:scale-110 transition-all active:scale-95" data-emoji="⭐️">
+          ⭐️ <span class="count text-sm font-medium ml-1">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 留言板区域 -->
+    <div class="mb-20">
+      <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">祝福留言板</h3>
+      
+      <!-- 留言输入框 -->
+      <div class="bg-white p-4 rounded-xl shadow-md mb-8">
+        <div class="flex gap-3">
+          <img src="./IMG_0067.JPG" alt="Your avatar" class="w-10 h-10 rounded-full">
+          <div class="flex-1">
+            <!-- 添加用户名输入 -->
+            <div class="mb-3">
+              <input type="text" id="name-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="请输入你的名字">
+            </div>
+            <textarea id="message-input" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none" placeholder="写下你的祝福吧..."></textarea>
+            <div class="flex justify-end mt-2">
+              <button id="send-message" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors">
+                发送祝福
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 留言列表 -->
+      <div id="messages-container" class="space-y-6">
+        <!-- 留言将通过JavaScript动态加载 -->
+        <div class="text-center text-gray-500 py-8">
+          还没有祝福，快来成为第一个送上祝福的人吧！
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark/90 text-white py-6 text-center relative z-10">
+    <p>🎉 感谢您的到来，祝您拥有美好的一天 🎉</p>
+  </footer>
+
+  <script>
+    // Supabase
+    const supabaseUrl = 'https://pjnzohwtjycuhrefbefn.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqbnpvaHd0anljdWhyZWZiZWZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3NjI2MDIsImV4cCI6MjA2ODMzODYwMn0.YlgehdGrXT9ZMBq7VqRWykY_9zALIl4Iquui_DDMqKo';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 初始化数据表
+      await initTables();
+      
+      // 加载表情计数
+      loadEmojiCounts();
+      
+      // 加载留言
+      loadMessages();
+      
+      // 启动彩带效果
+      startConfetti();
+      
+      // 播放背景音乐
+      document.body.addEventListener('click', playMusic, { once: true });
+      
+      // 绑定事件监听
+      bindEvents();
+      
+      // 订阅
+      setupRealtimeSubscriptions();
+    });
+
+    // 初始化数据表
+    async function initTables() {
+      try {
+        // 创建表情计数表
+        await supabase.rpc('create_reactions_table');
+      } catch (error) {
+        if (!error.message.includes('already exists')) {
+          console.error('创建reactions表失败:', error);
+        }
+      }
+      
+      try {
+        // 留言表
+        const { error: messagesError } = await supabase.rpc('create_messages_table');
+        if (messagesError) throw messagesError;
+      } catch (error) {
+        if (!error.message.includes('already exists')) {
+          console.error('创建messages表失败:', error);
+        } else {
+          // 如果表已存在，检查是否有name字段，没有则添加
+          try {
+            await supabase.rpc('add_name_to_messages');
+          } catch (addError) {
+            if (!addError.message.includes('already exists')) {
+              console.error('添加name字段失败:', addError);
+            }
+          }
+        }
+      }
+      
+      try {
+        // 创建回复表（增加name字段）
+        const { error: repliesError } = await supabase.rpc('create_replies_table');
+        if (repliesError) throw repliesError;
+      } catch (error) {
+        if (!error.message.includes('already exists')) {
+          console.error('创建replies表失败:', error);
+        } else {
+          // 如果表已存在，检查是否有name字段，没有则添加
+          try {
+            await supabase.rpc('add_name_to_replies');
+          } catch (addError) {
+            if (!addError.message.includes('already exists')) {
+              console.error('添加name字段失败:', addError);
+            }
+          }
+        }
+      }
+      
+      // 初始化
+      const { data: reactions } = await supabase.from('reactions').select('*');
+      if (!reactions || reactions.length === 0) {
+        const emojis = ['❤️', '💯', '🥳', '👊', '🌹', '🍭', '🎂', '🌈', '⭐️'];
+        const initialData = emojis.map(emoji => ({ emoji, count: 0 }));
+        await supabase.from('reactions').insert(initialData);
+      }
+    }
+
+    // 加载表情计数
+    async function loadEmojiCounts() {
+      try {
+        const { data, error } = await supabase.from('reactions').select('*');
+        
+        if (error) throw error;
+        
+        if (data) {
+          data.forEach(item => {
+            const btn = document.querySelector(`.emoji-btn[data-emoji="${item.emoji}"]`);
+            if (btn) {
+              btn.querySelector('.count').textContent = item.count;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('加载表情计数失败:', error);
+        showNotification('加载表情计数失败，请刷新页面重试', 'error');
+      }
+    }
+
+    // 加载留言
+    async function loadMessages() {
+      try {
+        const { data, error } = await supabase
+          .from('messages')
+          .select(`
+            *,
+            replies (
+              *
+            )
+          `)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+      
+        const container = document.getElementById('messages-container');
+        
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="text-center text-gray-500 py-8">还没有祝福，快来成为第一个送上祝福的人吧！</div>';
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        data.forEach(message => {
+          const messageEl = createMessageElement(message);
+          container.appendChild(messageEl);
+        });
+      } catch (error) {
+        console.error('加载留言失败:', error);
+        const container = document.getElementById('messages-container');
+        container.innerHTML = '<div class="text-center text-red-500 py-8">加载留言失败，请刷新页面重试</div>';
+      }
+    }
+
+    // 创建留言元素
+    function createMessageElement(message) {
+      const div = document.createElement('div');
+      div.className = 'bg-white p-4 rounded-xl shadow-md message-appear';
+      div.dataset.id = message.id;
+      
+      // 格式化日期
+      const date = new Date(message.created_at);
+      const formattedDate = date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      // 获取用户名，默认为"匿名祝福者"
+      const userName = message.name && message.name.trim() ? message.name : '匿名祝福者';
+      
+      div.innerHTML = `
+        <div class="flex gap-3">
+          <img src="./IMG_0067.JPG" alt="${userName}的头像" class="w-10 h-10 rounded-full">
+          <div class="flex-1">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-semibold text-gray-800">${userName}</h4>
+                <p class="text-sm text-gray-500">${formattedDate}</p>
+              </div>
+              <button class="like-message text-gray-400 hover:text-red-500 transition-colors" data-id="${message.id}">
+                <i class="fa fa-heart-o"></i>
+                <span class="ml-1">${message.likes || 0}</span>
+              </button>
+            </div>
+            <div class="mt-2 text-gray-700">
+              ${message.content}
+            </div>
+            
+            <!-- 回复区域 -->
+            <div class="mt-4">
+              <div class="replies-container space-y-3">
+                ${message.replies && message.replies.length > 0 
+                  ? message.replies.map(reply => {
+                      const replyName = reply.name && reply.name.trim() ? reply.name : '匿名回复';
+                      return `
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                          <div class="flex justify-between items-start">
+                            <div>
+                              <span class="font-medium text-sm">${replyName}</span>
+                              <span class="text-xs text-gray-500 ml-2">${new Date(reply.created_at).toLocaleString('zh-CN', {hour: '2-digit', minute: '2-digit'})}</span>
+                            </div>
+                            <button class="like-reply text-gray-400 hover:text-red-500 transition-colors text-xs" data-id="${reply.id}">
+                              <i class="fa fa-heart-o"></i>
+                              <span class="ml-1">${reply.likes || 0}</span>
+                            </button>
+                          </div>
+                          <p class="text-sm text-gray-700 mt-1">${reply.content}</p>
+                        </div>
+                      `;
+                    }).join('')
+                  : ''
+                }
+              </div>
+              
+              <!-- 回复输入 -->
+              <div class="mt-3 flex gap-2">
+                <img src="./IMG_0944.JPG" alt="Your avatar" class="w-7 h-7 rounded-full">
+                <div class="flex-1 flex gap-2">
+                  <input type="text" class="reply-name-input w-28 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="你的名字">
+                  <input type="text" class="reply-input flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none" placeholder="回复...">
+                  <button class="send-reply bg-primary/80 hover:bg-primary text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                    回复
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      return div;
+    }
+
+    // 绑定事件监听
+    function bindEvents() {
+      // 表情按钮点击
+      document.querySelectorAll('.emoji-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          const emoji = this.dataset.emoji;
+          
+          // 更新计数（乐观更新）
+          const countEl = this.querySelector('.count');
+          const currentCount = parseInt(countEl.textContent) || 0;
+          countEl.textContent = currentCount + 1;
+          
+          // 添加点击动画
+          this.classList.add('scale-90');
+          setTimeout(() => {
+            this.classList.remove('scale-90');
+          }, 200);
+          
+          // 更新数据库
+          try {
+            const { error } = await supabase
+              .from('reactions')
+              .update({ count: currentCount + 1 })
+              .eq('emoji', emoji);
+            
+            if (error) throw error;
+          } catch (error) {
+            console.error('更新表情计数失败:', error);
+            countEl.textContent = currentCount; // 回滚
+            showNotification('发送祝福失败，请重试', 'error');
+          }
+        });
+      });
+      
+      // 发送留言
+      document.getElementById('send-message').addEventListener('click', async function() {
+        const nameInput = document.getElementById('name-input');
+        const messageInput = document.getElementById('message-input');
+        const name = nameInput.value.trim();
+        const content = messageInput.value.trim();
+        
+        // 验证输入
+        if (!content) {
+          showNotification('请输入祝福内容', 'warning');
+          return;
+        }
+        
+        // 禁用按钮防止重复提交
+        this.disabled = true;
+        this.textContent = '发送中...';
+        
+        try {
+          // 添加到数据库
+          const { error } = await supabase
+            .from('messages')
+            .insert([
+              { content, name: name || null, likes: 0 }
+            ]);
+          
+          if (error) throw error;
+          
+          // 清空输入框
+          nameInput.value = '';
+          messageInput.value = '';
+          
+          showNotification('祝福发送成功！', 'success');
+        } catch (error) {
+          console.error('发送留言失败:', error);
+          showNotification('发送失败，请稍后再试', 'error');
+        } finally {
+          // 恢复按钮状态
+          this.disabled = false;
+          this.textContent = '发送祝福';
+        }
+      });
+      
+      // 留言板交互事件委托
+      document.getElementById('messages-container').addEventListener('click', async function(e) {
+        // 处理留言点赞
+        if (e.target.closest('.like-message')) {
+          const btn = e.target.closest('.like-message');
+          const messageId = btn.dataset.id;
+          const likeCountEl = btn.querySelector('span');
+          const currentLikes = parseInt(likeCountEl.textContent) || 0;
+          const icon = btn.querySelector('i');
+          
+          try {
+            // 检查当前是否已点赞
+            const isLiked = icon.classList.contains('fa-heart');
+            const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+            
+            // 乐观更新UI
+            likeCountEl.textContent = newLikes;
+            icon.classList.toggle('fa-heart');
+            icon.classList.toggle('fa-heart-o');
+            icon.classList.toggle('text-red-500');
+            
+            // 更新数据库
+            const { error } = await supabase
+              .from('messages')
+              .update({ likes: newLikes })
+              .eq('id', messageId);
+            
+            if (error) throw error;
+          } catch (error) {
+            console.error('更新留言点赞失败:', error);
+            showNotification('点赞失败，请重试', 'error');
+            // 回滚UI
+            const isLiked = icon.classList.contains('fa-heart');
+            likeCountEl.textContent = isLiked ? currentLikes + 1 : currentLikes - 1;
+            icon.classList.toggle('fa-heart');
+            icon.classList.toggle('fa-heart-o');
+            icon.classList.toggle('text-red-500');
+          }
+        }
+        
+        // 处理回复点赞
+        if (e.target.closest('.like-reply')) {
+          const btn = e.target.closest('.like-reply');
+          const replyId = btn.dataset.id;
+          const likeCountEl = btn.querySelector('span');
+          const currentLikes = parseInt(likeCountEl.textContent) || 0;
+          const icon = btn.querySelector('i');
+          
+          try {
+            // 检查当前是否已点赞
+            const isLiked = icon.classList.contains('fa-heart');
+            const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+            
+            // 乐观更新UI
+            likeCountEl.textContent = newLikes;
+            icon.classList.toggle('fa-heart');
+            icon.classList.toggle('fa-heart-o');
+            icon.classList.toggle('text-red-500');
+            
+            // 更新数据库
+            const { error } = await supabase
+              .from('replies')
+              .update({ likes: newLikes })
+              .eq('id', replyId);
+            
+            if (error) throw error;
+          } catch (error) {
+            console.error('更新回复点赞失败:', error);
+            showNotification('点赞失败，请重试', 'error');
+            // 回滚UI
+            const isLiked = icon.classList.contains('fa-heart');
+            likeCountEl.textContent = isLiked ? currentLikes + 1 : currentLikes - 1;
+            icon.classList.toggle('fa-heart');
+            icon.classList.toggle('fa-heart-o');
+            icon.classList.toggle('text-red-500');
+          }
+        }
+        
+        // 处理发送回复
+        if (e.target.closest('.send-reply')) {
+          const btn = e.target.closest('.send-reply');
+          const nameInput = btn.parentElement.querySelector('.reply-name-input');
+          const replyInput = btn.parentElement.querySelector('.reply-input');
+          const name = nameInput.value.trim();
+          const content = replyInput.value.trim();
+          const messageId = btn.closest('[data-id]').dataset.id;
+          
+          // 验证输入
+          if (!content) {
+            showNotification('请输入回复内容', 'warning');
+            return;
+          }
+          
+          // 禁用按钮防止重复提交
+          btn.disabled = true;
+          btn.textContent = '回复中...';
+          
+          try {
+            // 添加到数据库
+            const { error } = await supabase
+              .from('replies')
+              .insert([
+                { message_id: messageId, content, name: name || null, likes: 0 }
+              ]);
+            
+            if (error) throw error;
+            
+            // 清空输入框
+            nameInput.value = '';
+            replyInput.value = '';
+            
+            showNotification('回复成功！', 'success');
+          } catch (error) {
+            console.error('发送回复失败:', error);
+            showNotification('回复失败，请稍后再试', 'error');
+          } finally {
+            // 恢复按钮状态
+            btn.disabled = false;
+            btn.textContent = '回复';
+          }
+        }
+      });
+      
+      // 按Enter发送留言
+      document.getElementById('message-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          document.getElementById('send-message').click();
+        }
+      });
+      
+      // 按Enter发送回复
+      document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target.classList.contains('reply-input') && !e.shiftKey) {
+          e.preventDefault();
+          e.target.nextElementSibling.click();
+        }
+      });
+    }
+
+    // 设置实时订阅
+    function setupRealtimeSubscriptions() {
+      // 订阅留言表变化
+      const messagesSubscription = supabase
+        .channel('custom-all-channel')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'messages' },
+          (payload) => {
+            console.log('留言表变化:', payload);
+            loadMessages(); // 重新加载留言
+          }
+        )
+        .subscribe();
+      
+      // 订阅回复表变化
+      const repliesSubscription = supabase
+        .channel('custom-replies-channel')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'replies' },
+          (payload) => {
+            console.log('回复表变化:', payload);
+            loadMessages(); // 重新加载留言
+          }
+        )
+        .subscribe();
+      
+      // 订阅表情表变化
+      const reactionsSubscription = supabase
+        .channel('custom-reactions-channel')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'reactions' },
+          (payload) => {
+            console.log('表情表变化:', payload);
+            loadEmojiCounts(); // 重新加载表情计数
+          }
+        )
+        .subscribe();
+    }
+
+    // 彩带效果
+    function startConfetti() {
+      const container = document.getElementById('confetti-container');
+      const colors = ['#FF6B8B', '#A78BFA', '#FBBF24', '#34D399', '#60A5FA', '#EC4899'];
+      
+      function createConfetti() {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        
+        // 随机属性
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = `${Math.random() * 10 + 5}px`;
+        confetti.style.height = `${Math.random() * 10 + 5}px`;
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `-${Math.random() * 20 + 10}px`;
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+        
+        container.appendChild(confetti);
+        
+        // 动画结束后移除
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+      
+      // 添加动画关键帧
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // 定时创建彩带
+      const confettiInterval = setInterval(createConfetti, 200);
+      
+      // 页面离开时清理
+      window.addEventListener('beforeunload', () => {
+        clearInterval(confettiInterval);
+      });
+    }
+
+    // 播放音乐
+    function playMusic() {
+      const audio = document.getElementById('partyMusic');
+      audio.volume = 0.3; // 降低音量
+      audio.play().catch(error => {
+        console.log('音乐播放需要用户交互:', error);
+      });
+    }
+
+    // 显示通知
+    function showNotification(message, type = 'info') {
+      // 创建通知元素
+      const notification = document.createElement('div');
+      
+      // 设置样式
+      let bgColor = 'bg-blue-500'; // 默认信息色
+      if (type === 'success') bgColor = 'bg-green-500';
+      if (type === 'error') bgColor = 'bg-red-500';
+      if (type === 'warning') bgColor = 'bg-yellow-500';
+      
+      notification.className = `${bgColor} text-white px-4 py-2 rounded-lg shadow-lg fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300`;
+      notification.textContent = message;
+      
+      // 添加到页面
+      document.body.appendChild(notification);
+      
+      // 显示通知
+      setTimeout(() => {
+        notification.classList.remove('translate-y-20', 'opacity-0');
+      }, 100);
+      
+      // 自动隐藏
+      setTimeout(() => {
+        notification.classList.add('translate-y-20', 'opacity-0');
+        setTimeout(() => {
+          notification.remove();
+        }, 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

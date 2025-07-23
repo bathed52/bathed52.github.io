@@ -1,0 +1,47 @@
+@import url('https://cdn.tailwindcss.com');
+
+:root {
+  --primary: #FF6B8B;
+  --secondary: #A78BFA;
+  --accent: #FBBF24;
+  --light: #FFF1F2;
+  --dark: #4C1D95;
+}
+
+body {
+  font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.emoji-btn {
+  font-size: 1.5rem;
+  padding: 1rem;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.emoji-btn:hover {
+  transform: scale(1.1);
+}
+
+footer {
+  background: rgba(76, 29, 149, 0.9);
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+}
